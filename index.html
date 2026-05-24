@@ -56,8 +56,14 @@
             background-blend-mode: multiply;
             box-shadow: 0 6px 22px rgba(0, 0, 0, 0.35);
             animation: spin 18s linear infinite;
+            animation-play-state: paused;
             cursor: pointer;
             z-index: 2;
+        }
+
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
         }
 
         .record::after {
@@ -83,16 +89,7 @@
             pointer-events: none;
         }
 
-        .tonearm-base {
-            position: absolute;
-            top: 32px;
-            right: 32px;
-            width: 18px;
-            height: 18px;
-            background-color: #ffffff;
-            border-radius: 50%;
-        }
-
+        /*唱针初始 5° 抬起*/
         .tonearm-arm {
             position: absolute;
             top: 32px;
@@ -102,8 +99,8 @@
             background-color: #ffffff;
             border-radius: 3px;
             transform-origin: right center;
-            transform: rotate(-25deg);
-            transition: transform 0.5s ease-in-out;
+            transform: rotate(5deg);
+            transition: transform 0.6s ease-in-out;
         }
 
         .tonearm-tip {
@@ -117,10 +114,27 @@
             border-radius: 50%;
         }
 
-        .tonearm-arm.lifted {
-            transform: rotate(5deg);
+        .tonearm-arm.play {
+            transform: rotate(-25deg);
         }
 
+        /*提示文字 精准放在黑胶正上方*/
+        .tip-text{
+            position: absolute;
+            top: 26%;
+            left: 50%;
+            transform: translateX(-50%);
+            color:#ffffff;
+            font-size:18px;
+            opacity:1;
+            transition:opacity 0.8s ease;
+            letter-spacing:2px;
+        }
+        .tip-text.fadeout{
+            opacity:0;
+        }
+
+        /*主标题初始透明*/
         .title {
             position: absolute;
             top: 50%;
@@ -132,15 +146,11 @@
             font-weight: 500;
             z-index: 4;
             pointer-events: none;
+            opacity:0;
+            transition:opacity 1s ease 0.2s;
         }
-
-        @keyframes spin {
-            0% { transform: translate(-50%, -50%) rotate(0deg); }
-            100% { transform: translate(-50%, -50%) rotate(360deg); }
-        }
-
-        .record.paused {
-            animation-play-state: paused;
+        .title.show{
+            opacity:1;
         }
 
         .control-hint {
@@ -293,8 +303,10 @@
 </head>
 <body>
 
-<!--所有页面元素优先渲染，预览百分百正常-->
 <div class="page first-page">
+    <!--文字位置：黑胶正上方居中-->
+    <div class="tip-text">请点击唱片</div>
+
     <div class="player"></div>
     <div class="record" id="record"></div>
     <div class="tonearm">
@@ -303,7 +315,7 @@
             <div class="tonearm-tip"></div>
         </div>
     </div>
-    <h1 class="title">Happy Birthday</h1>
+    <h1 class="title" id="mainTitle">Happy Birthday</h1>
     <div class="control-hint">点击唱片暂停/播放音乐</div>
     <div class="scroll-hint">向下滑动继续浏览</div>
     <div class="down-arrow">︾</div>
@@ -373,10 +385,8 @@
     </div>
 </div>
 
-<!--音频放置底部，采用【智能预加载】-->
-<audio id="bgMusic" loop preload="auto">
+<audio id="bgMusic" loop>
     <source src="music.mp3" type="audio/mpeg">
-
 
 <script>
 const record = document.getElementById('record');
@@ -384,8 +394,10 @@ const tonearm = document.getElementById('tonearm');
 const bgMusic = document.getElementById('bgMusic');
 const musicControl2 = document.getElementById('musicControl2');
 const musicControl3 = document.getElementById('musicControl3');
+const tipText = document.querySelector('.tip-text');
+const mainTitle = document.getElementById('mainTitle');
 
-let isPlaying = true;
+let isPlaying = false;
 
 function updateMusicButtons(){
     let icon = isPlaying ? '🎵' : '🔇';
@@ -393,38 +405,35 @@ function updateMusicButtons(){
     musicControl3.textContent = icon;
 }
 
-//核心优化：页面DOM渲染完毕之后，再加载音频，互不阻塞
-document.addEventListener("DOMContentLoaded", function(){
-    //画面全部加载完成，后台开始预缓存音乐
+//音乐预加载 初始暂停
+window.addEventListener('load',function(){
     bgMusic.load();
-});
+    bgMusic.pause();
+})
 
-//音乐开关
+//点击唱片全套联动动画
 function toggleMusic(){
-    if(isPlaying){
-        tonearm.classList.add('lifted');
-        record.classList.add('paused');
-        bgMusic.pause();
-        isPlaying = false;
-    }else{
-        tonearm.classList.remove('lifted');
-        record.classList.remove('paused');
+    if(!isPlaying){
+        tipText.classList.add('fadeout');
+        tonearm.classList.add('play');
+        record.style.animationPlayState = 'running';
+        mainTitle.classList.add('show');
         bgMusic.play();
         isPlaying = true;
+    }else{
+        record.style.animationPlayState = 'paused';
+        tonearm.classList.remove('play');
+        bgMusic.pause();
+        isPlaying = false;
     }
     updateMusicButtons();
 }
-
-//浏览器自动播放限制兼容
-document.addEventListener('click',()=>{
-    bgMusic.play();
-},{once:true})
 
 record.addEventListener('click',toggleMusic);
 musicControl2.addEventListener('click',toggleMusic);
 musicControl3.addEventListener('click',toggleMusic);
 
-//原版颜色渐变完好保留
+//背景渐变
 const color1 = { r: 142, g: 156, b: 171 };
 const color2 = { r: 159, g: 197, b: 232 };
 const color3 = { r: 180, g: 210, b: 240 };
@@ -446,7 +455,7 @@ window.addEventListener('scroll',()=>{
     document.body.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
 })
 
-//全部时间功能原样
+//时间时钟
 function updateClock(){
     let now = new Date();
     let h = String(now.getHours()).padStart(2,'0');
@@ -481,7 +490,7 @@ function updateBirthdayCountdown(){
     document.getElementById('birthday-countdown').innerText = `${String(d).padStart(2,0)}:${String(h).padStart(2,0)}:${String(mi).padStart(2,0)}:${String(se).padStart(2,0)}`;
 }
 
-//许愿动画
+//蛋糕许愿动画
 let cakeBtn = document.getElementById('cakeBtn');
 let wishText = document.getElementById('wishCount');
 cakeBtn.onclick = function(){
@@ -490,7 +499,7 @@ cakeBtn.onclick = function(){
     wishText.classList.add('show');
 }
 
-//信封信件
+//信件弹窗
 let envelope = document.getElementById('envelope');
 let letterBox = document.getElementById('letter');
 let closeBtn = document.getElementById('closeLetter');
