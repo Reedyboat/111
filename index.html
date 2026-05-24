@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✨Bear🐻生日快乐！✨</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Times New Roman', serif;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+            background-color: #8e9cab;
+        }
+
+        .page {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        /* 播放器底座 */
+        .player {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            height: 400px;
+            background-color: #c2c9d1;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+        }
+
+        /* 【终极加重高光 超强镜面反光黑胶唱片】 */
+        .record {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 330px;
+            height: 330px;
+            border-radius: 50%;
+            background: 
+                radial-gradient(circle at 25% 25%, rgba(130,138,150,0.55) 0%, transparent 52%),
+                radial-gradient(circle at 75% 70%, rgba(145,152,165,0.48) 0%, transparent 48%),
+                linear-gradient(15deg, #0e0e0e 20%, #292929 45%, #0e0e0e 70%),
+                repeating-radial-gradient(
+                    circle at center,
+                    transparent 0 6px,
+                    #161616 6px 9px
+                );
+            background-blend-mode: multiply;
+            box-shadow: 
+                0 8px 26px rgba(0, 0, 0, 0.4),
+                inset 0 0 50px rgba(255,255,255,0.15);
+            animation: spin 18s linear infinite;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        /* 唱片中心圆孔 */
+        .record::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 52px;
+            height: 52px;
+            background-color: #8e9cab;
+            border-radius: 50%;
+        }
+
+        /* 唱针组件 */
+        .tonearm {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            height: 400px;
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        .tonearm-base {
+            position: absolute;
+            top: 32px;
+            right: 32px;
+            width: 18px;
+            height: 18px;
+            background-color: #ffffff;
+            border-radius: 50%;
+        }
+
+        .tonearm-arm {
+            position: absolute;
+            top: 32px;
+            right: 32px;
+            width: 158px;
+            height: 3px;
+            background-color: #ffffff;
+            border-radius: 3px;
+            transform-origin: right center;
+            transform: rotate(-25deg);
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .tonearm-tip {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 7px;
+            height: 7px;
+            background-color: #ffffff;
+            border-radius: 50%;
+        }
+
+        .tonearm-arm.lifted {
+            transform: rotate(5deg);
+        }
+
+        .title {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ffffff;
+            font-size: 36px;
+            letter-spacing: 3px;
+            font-weight: 500;
+            z-index: 4;
+            pointer-events: none;
+        }
+
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .record.paused {
+            animation-play-state: paused;
+        }
+
+        .control-hint {
+            position: absolute;
+            bottom: 90px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+            letter-spacing: 1px;
+            z-index: 4;
+            pointer-events: none;
+        }
+
+        .scroll-hint {
+            position: absolute;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            letter-spacing: 1px;
+            z-index: 4;
+            pointer-events: none;
+        }
+
+        .down-arrow {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 24px;
+            z-index: 4;
+            pointer-events: none;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateX(-50%) translateY(0);
+            }
+            40% {
+                transform: translateX(-50%) translateY(-8px);
+            }
+            60% {
+                transform: translateX(-50%) translateY(-4px);
+            }
+        }
+
+        /* 第二页样式 */
+        .second-page {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .music-control {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            font-size: 28px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            user-select: none;
+            z-index: 10;
+        }
+
+        .music-control:hover {
+            transform: scale(1.1);
+        }
+
+        .music-control:active {
+            transform: scale(0.95);
+        }
+
+        .birthday-title {
+            color: #ffffff;
+            font-size: 32px;
+            letter-spacing: 2px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            max-width: 600px;
+            width: 100%;
+            margin-bottom: 50px;
+        }
+
+        .card {
+            background-color: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .card-title {
+            color: #444;
+            font-size: 16px;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        .card-value {
+            color: #222;
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .card-subtitle {
+            color: #555;
+            font-size: 12px;
+        }
+
+        .clock-card {
+            grid-column: 1 / -1;
+        }
+
+        .clock-time {
+            font-size: 48px;
+            letter-spacing: 2px;
+        }
+
+        .clock-date {
+            font-size: 16px;
+            color: #555;
+        }
+
+        .wish-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .cake-button {
+            font-size: 80px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            user-select: none;
+        }
+
+        .cake-button:hover {
+            transform: scale(1.1);
+        }
+
+        .cake-button:active {
+            transform: scale(0.95);
+        }
+
+        .wish-count {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #fff;
+            font-size: 20px;
+            font-weight: bold;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .wish-count.show {
+            animation: floatUp 1s ease-out forwards;
+        }
+
+        @keyframes floatUp {
+            0% {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-50px);
+            }
+        }
+
+        .wish-text {
+            margin-top: 15px;
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 16px;
+            letter-spacing: 1px;
+        }
+
+        /* 第三页 信封信纸 */
+        .third-page {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .envelope-hint {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 16px;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            pointer-events: none;
+        }
+
+        .envelope {
+            font-size: 120px;
+            cursor: pointer;
+            transition: all 0.5s ease;
+            user-select: none;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .envelope:hover {
+            transform: scale(1.05);
+        }
+
+        .envelope.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.8);
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .letter {
+            background-color: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 30px;
+            width: 520px;
+            height: 65vh;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .letter.show {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translate(-50%, -50%);
+        }
+
+        .letter::-webkit-scrollbar{
+            width: 6px;
+        }
+        .letter::-webkit-scrollbar-thumb{
+            background:#c8cdd3;
+            border-radius:3px;
+        }
+
+        .letter-content {
+            color: #444;
+            font-size: 16px;
+            line-height: 1.8;
+            text-align: justify;
+        }
+
+        .sign{
+            text-align: right;
+            margin-top:15px;
+        }
+
+        .close-letter {
+            display: block;
+            margin: 25px auto 0;
+            padding: 10px 25px;
+            background-color: rgba(142, 156, 171, 0.8);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .close-letter:hover {
+            background-color: rgba(142, 156, 171, 1);
+            transform: scale(1.05);
+        }
+
+        /* 手机端适配 */
+        @media (max-width: 650px) {
+            .player {
+                width: 320px;
+                height: 320px;
+            }
+            
+            .record {
+                width: 260px;
+                height: 260px;
+            }
+            
+            .tonearm {
+                width: 320px;
+                height: 320px;
+            }
+            
+            .tonearm-arm {
+                width: 125px;
+            }
+            
+            .title {
+                font-size: 28px;
+            }
+            
+            .music-control {
+                top: 20px;
+                right: 20px;
+                font-size: 24px;
+            }
+            
+            .birthday-title {
+                font-size: 24px;
+                margin-bottom: 30px;
+            }
+            
+            .cards-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .clock-time {
+                font-size: 36px;
+            }
+            
+            .cake-button {
+                font-size: 60px;
+            }
+            
+            .envelope {
+                font-size: 80px;
+            }
+            
+            .letter {
+                width: 92%;
+                height: 70vh;
+                padding: 22px;
+            }
+            
+            .letter-content {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 第一页：黑胶播放器 -->
+    <div class="page first-page">
+        <div class="player"></div>
+        <div class="record" id="record"></div>
+        <div class="tonearm">
+            <div class="tonearm-base"></div>
+            <div class="tonearm-arm" id="tonearm">
+                <div class="tonearm-tip"></div>
+            </div>
+        </div>
+        <h1 class="title">Happy Birthday</h1>
+        <div class="control-hint">点击唱片暂停/播放音乐</div>
+        <div class="scroll-hint">向下滑动继续浏览</div>
+        <div class="down-arrow">︾</div>
+    </div>
+
+    <!-- 第二页：功能区域 -->
+    <div class="page second-page">
+        <div class="music-control" id="musicControl2">🎵</div>
+        <h2 class="birthday-title">✨Bear🐻生日快乐！✨</h2>
+        <div class="cards-container">
+            <div class="card clock-card">
+                <div class="card-title">现在时间</div>
+                <div class="card-value clock-time" id="clock">00:00:00</div>
+                <div class="card-date" id="date">2024年01月01日 星期一</div>
+            </div>
+            <div class="card">
+                <div class="card-title">我们在一起已经</div>
+                <div class="card-value" id="anniversary">0</div>
+                <div class="card-subtitle">天 · 从2018年8月26日开始</div>
+            </div>
+            <div class="card">
+                <div class="card-title">距离下一次生日还有</div>
+                <div class="card-value" id="birthday-countdown">00:00:00:00</div>
+                <div class="card-subtitle">天 · 时 · 分 · 秒 · 5月29日</div>
+            </div>
+        </div>
+        <div class="wish-container">
+            <div class="cake-button" id="cakeBtn">🎂</div>
+            <div class="wish-count" id="wishCount">愿望+1 ✨</div>
+            <div class="wish-text">点击蛋糕许下生日愿望</div>
+        </div>
+        <div class="down-arrow" style="position: absolute; bottom: 30px;">︾</div>
+    </div>
+
+    <!-- 第三页 信件 -->
+    <div class="page third-page">
+        <div class="music-control" id="musicControl3">🎵</div>
+        <div class="envelope-hint">点击查看信件</div>
+        <div class="envelope" id="envelope">✉️</div>
+        <div class="letter" id="letter">
+            <div class="letter-content">
+给熊🐻：<br><br>
+展信佳。先祝你二十岁生日快乐！也是成功地多活了一年，值得庆祝值得庆祝。<br><br>
+过了十八岁之后，我对自己的年龄概念就已经开始有些模糊了，今年过生日的时候才想起来，我好像已经二十岁了，某种程度上已经开始老了（扶额）可能如此。<br><br>
+写手写信需要的条件不少，特别是离开了高中之后，不能天天见面，写信这个概念从“写小纸条”真的演化成“写信”的时候，就更多要求了。我有打算过买信封信纸，再买一张生日快乐的邮票贴上去，最后放进我们学校的邮筒，但是邮政的效率一向让我不那么能够理解，再加上或多或少会有一些运损，想想看我还是打消了这个念头。你问我为什么不寄别的物流……那还能叫写信吗……装在一个放录取通知书那样大的袋子里的信……<br><br>
+我小时候倒是写过信。说是写信其实也只是一个作文比赛，一张a3纸差不多大小的信纸，折起来差不多就是信封一样大，它可以自成一个信封，写完东西之后填好收信人和寄信人，就直接投出去，因为是作文比赛，我没有写给朋友然后让朋友收，信我是写给我的太奶，但是信封上的收件人嘛是我自己。过了大概一周多，我在旧家楼下看见自己寄给自己的信插在大门上……跟隔壁的报纸一样。<br><br>
+我也喜欢寄明信片，之前去一个叫黄姚古镇的地方，那时候那个地方还没有那么商业化。实话实说现在什么古镇都是一个样……我爸心心念念说要再去一遍结果一去就大失所望，白开车这么久——扯远了。总之我那时候买了大概十张明信片，寄给当时用QQ能联系上的小学同学，不知道为什么那天在线的人特别少，能回我消息给我地址的也没几个，最后就寄出去大概四五张。我给自己也寄了一张，看到明信片上的字迹因为没有受到保护而花了一点，邮票的位置盖了邮戳，我心想原来这就是寄东西啊，怪好玩的。<br><br>
+说着好玩实则就十几年没有寄过信了。不过要写的东西做成网页的形式也挺新奇的吧，至少挺好玩的？<br><br>
+我有过很多想法，因为行动力和技术力不足，都没有认真实现。之前想的是用RPG maker给你做个小游戏当礼物，但是游戏也需要美术，需要剧情文案，还需要各种各样的设计，结果就是我趁着RPG maker打折买了下来，结果现在都还没有打开过（）<br><br>
+那就退而求其次做个文游吧，就是GalGame那样子的，需要最多的是文本，美术什么的说不定我随便糊弄一下也能成呢，再不济搞成Lifeline那个样子的文游——你玩过Lifeline吗，这游戏还出了第二部，总而言之讲的是玩家帮助手机另一头孤身一人的宇航员对抗外星生物的故事，我小学的时候在外婆家没事干，拿着连不上网的平板就爱玩这个。结果这么长一个故事还有这么多的分支，用专门的软件做还要学习专门的编程技巧，想一想就要烧干我的所有想象力，在我没有惊世灵感之前我是绝对不做了……或许可能会做？主要是我也没有完全想好。<br><br>
+最后就做了一个网页出来。这也算是迈出第一步，虽然页面很简单，但还算是有那么点意思。能让自己的一个小想法落地的感觉不赖，就像写东西一样。我自认没有什么设计的能力，所以只是做了一些简单的小组件，配了一首你喜欢的歌，还塞了这么一封信。<br><br>
+东扯西扯讲了这么多，一下子又没有写信的感觉了，说到底谁规定我写信不能讲这讲那的。<br><br>
+嗯，聊聊我送了你什么礼物吧。这个也挺可聊的。<br><br>
+心想你既然喜欢ccd这种拍照的风格，或许送你个胶片机也不错。你拿到手的纯粹是个傻瓜机，一次性的，里面只有一卷胶卷，作为入门尝试完全足够。如果你拍完了，有时间去冲洗出来，觉得质感还不错的话，多开拓一种留影方式也不是不可以。就是要做好准备……价格和设备都是。我高一的时候也买过胶卷送人，完全因为对方告诉我他在家里找到一个旧的胶卷相机。那时候价格大概是四十多？现在好像是六七十吧，再加上你可能需要更好的设备才能拍出质感更好更清晰的照片啦……想这么多干嘛，先把手头上这三十多张拍完吧。<br><br>
+理论上化学留影的照片是无限像素的，对吧？我喜欢这种形容，有一种不受限制的感觉。虽然主观上看起来还是不甚清晰，但是客观上，这种留影方式确实没有什么像素可言……或许你听说过反转片吗？真的能给你一种，再次体会你按下快门时感受的那种感觉。再加上胶片是物理介质，比数码介质来得更加踏实，它永远在那里，只要你记得它放在哪，不会因为什么硬盘坏掉，格式太旧而没有办法打开。说到这个……初中疫情的时候，我因为把家里的电脑待机太久，把它烧坏了来着，然后硬盘里的东西也是成功地没了大半，还换了一个让我不满了好几年的简易主机。我爱我的笔记本电脑。<br><br>
+至于另外一个电子垃圾一样的赛博锦囊……这个完全是觉得它很好玩。纯粹的运势，纯粹的Yes or No，纯粹的赛博求签，适合做事没有头绪的时候——好吧，赛博答案之书来了。<br><br>
+如果我要送这个，为什么不直接带你喝个幸运咖拿副可以兑换的纸牌？那上面也有类似的东西，我还有两副。不过还是这个电子的好用吧？图个好意头。原本是想送个蓝色的，但是那一款是夏日限定，要在六月中旬才开始发货。我们熊重金五月份就要过生日！只能早到不能晚到！就算是等到儿童节也不行！于是买了个紫色的，不赖。希望它能解决你生活中的一些小问题。当然了，它提供的纯属小建议？要好好用它关照自己的生活啊。<br><br>
+好了，关于生日要说的东西也就差不多到这。说了一堆自己的事情和想法，希望你不要觉得我太敷衍啦。<br><br>
+最后，谢谢你一直给了我很多可能，让我真的做了很多能把自己的胡思乱想变成现实的事情。就像现在你在看的这个东西一样。<br><br>
+试着相信好了，相信自己不止能给别人带来这种好的影响，也能给自己带来不少好运和好事，相信重金你在未来也会做很多自己喜欢的、有意思的事情！<br><br>
+还有，专注当下，就像用一卷菲林一样，好好使用，不要放过期了——意思就是让你今天明天后天大后天都好好照顾自己，过自己当下喜欢的生活，不用想太多外界和未来的事，才能有个好心情∧∧。<br><br>
+最最重要的一点是别把自己饿似了！小心胃溃疡胃穿孔什么的！很可怕的诶！我很担心你啊！.jpg<br><br>
+<div class="sign">
+来自Reedyboat<br>
+2026.05.20
+</div>
+            </div>
+            <button class="close-letter" id="closeLetter">阅读完毕</button>
+        </div>
+    </div>
+
+    <!-- 背景音乐 -->
+    <audio id="bgMusic" loop>
+        <source src="music.mp3" type="audio/mpeg">
+    
+
+    <script>
+        // 页面渐变背景
+        const color1 = { r: 142, g: 156, b: 171 };
+        const color2 = { r: 159, g: 197, b: 232 };
+        const color3 = { r: 180, g: 210, b: 240 };
+
+        window.addEventListener('scroll', () => {
+            const scrollY = window.scrollY;
+            const windowHeight = window.innerHeight;
+            const progress = scrollY / windowHeight;
+            let r, g, b;
+            if (progress <= 1) {
+                r = Math.round(color1.r + (color2.r - color1.r) * progress);
+                g = Math.round(color1.g + (color2.g - color1.g) * progress);
+                b = Math.round(color1.b + (color2.b - color1.b) * progress);
+            } else {
+                const p = progress - 1;
+                r = Math.round(color2.r + (color3.r - color2.r) * p);
+                g = Math.round(color2.g + (color3.g - color2.g) * p);
+                b = Math.round(color2.b + (color3.b - color2.b) * p);
+            }
+            document.body.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+        });
+
+        // 音乐控制
+        const record = document.getElementById('record');
+        const tonearm = document.getElementById('tonearm');
+        const bgMusic = document.getElementById('bgMusic');
+        const musicControl2 = document.getElementById('musicControl2');
+        const musicControl3 = document.getElementById('musicControl3');
+        let isPlaying = true;
+
+        function updateMusicButtons() {
+            const icon = isPlaying ? '🎵' : '🔇';
+            musicControl2.textContent = icon;
+            musicControl3.textContent = icon;
+        }
+
+        function toggleMusic() {
+            if (isPlaying) {
+                tonearm.classList.add('lifted');
+                record.classList.add('paused');
+                bgMusic.pause();
+                isPlaying = false;
+            } else {
+                tonearm.classList.remove('lifted');
+                record.classList.remove('paused');
+                bgMusic.play();
+                isPlaying = true;
+            }
+            updateMusicButtons();
+        }
+
+        document.addEventListener('click', () => {
+            bgMusic.play();
+            updateMusicButtons();
+        }, { once: true });
+
+        record.addEventListener('click', toggleMusic);
+        musicControl2.addEventListener('click', toggleMusic);
+        musicControl3.addEventListener('click', toggleMusic);
+
+        // 时钟 纪念日 倒计时
+        function updateClock() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2,'0');
+            const minutes = String(now.getMinutes()).padStart(2,'0');
+            const seconds = String(now.getSeconds()).padStart(2,'0');
+            document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
+            const year = now.getFullYear();
+            const month = String(now.getMonth()+1).padStart(2,'0');
+            const day = String(now.getDate()).padStart(2,'0');
+            const weekArr = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
+            document.getElementById('date').textContent = `${year}年${month}月${day}日 ${weekArr[now.getDay()]}`;
+        }
+
+        function updateAnniversary(){
+            const start = new Date(2018,7,26);
+            const now = new Date();
+            const day = Math.floor((now - start) / (1000*60*60*24));
+            document.getElementById('anniversary').innerText = day;
+        }
+
+        function updateBirthdayCountdown(){
+            const now = new Date();
+            let birth = new Date(now.getFullYear(),4,29);
+            if(now > birth) birth = new Date(now.getFullYear()+1,4,29);
+            const diff = birth - now;
+            const d = Math.floor(diff / (1000*60*60*24));
+            const h = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
+            const m = Math.floor((diff % (1000*60*60)) / (1000*60));
+            const s = Math.floor((diff % (1000*60)) / 1000);
+            document.getElementById('birthday-countdown').innerText = `${String(d).padStart(2,'0')}:${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+        }
+
+        // 蛋糕许愿动画
+        const cakeBtn = document.getElementById('cakeBtn');
+        const wishCount = document.getElementById('wishCount');
+        cakeBtn.addEventListener('click',()=>{
+            wishCount.classList.remove('show');
+            void wishCount.offsetWidth;
+            wishCount.classList.add('show');
+        });
+
+        // 信封信纸
+        const envelope = document.getElementById('envelope');
+        const letter = document.getElementById('letter');
+        const closeLetter = document.getElementById('closeLetter');
+        envelope.addEventListener('click',()=>{
+            envelope.classList.add('hidden');
+            setTimeout(()=>letter.classList.add('show'),300);
+        });
+        closeLetter.addEventListener('click',()=>{
+            letter.classList.remove('show');
+            setTimeout(()=>envelope.classList.remove('hidden'),300);
+        });
+
+        function allUpdate(){
+            updateClock();
+            updateAnniversary();
+            updateBirthdayCountdown();
+        }
+        allUpdate();
+        setInterval(allUpdate,1000);
+    </script>
+</body>
+</html>
